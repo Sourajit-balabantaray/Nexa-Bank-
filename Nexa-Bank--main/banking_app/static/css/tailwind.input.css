@@ -1,0 +1,26 @@
+@import "tailwindcss" important;
+
+@source "../../templates";
+@source "../js";
+
+@theme {
+  --color-bank-950: #edf6ff;
+  --color-bank-900: #e0efff;
+  --color-bank-800: #f7fbff;
+  --color-bank-700: #cfe5ff;
+  --color-bank-500: #2878d0;
+  --color-bank-400: #4a90e2;
+  --color-bank-300: #79afea;
+  --color-mint: #49d7aa;
+  --shadow-card: 0 18px 55px rgb(2 8 23 / 24%);
+}
+
+@utility tw-card {
+  @apply rounded-2xl shadow-xl;
+}
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+  }
+}

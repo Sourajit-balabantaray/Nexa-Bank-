@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Notifications{% endblock %}
+{% block page_title %}Notifications{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <h1>Notifications</h1>
+    <p class="text-muted">Updates about your account and recent activity.</p>
+  </div>
+  {% if notifications|selectattr('is_read', 'equalto', false)|list %}
+  <form method="post" action="{{ url_for('notifications.mark_all_read') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn btn-outline" type="submit">Mark all as read</button>
+  </form>
+  {% endif %}
+</div>
+
+<section class="notification-list" aria-label="Your notifications">
+  {% for notification in notifications %}
+  <article class="notification-card {{ 'notification-unread' if not notification.is_read else '' }}">
+    <div class="notification-icon notification-{{ notification.notification_type }}">
+      <i class="fa-solid {{ 'fa-circle-check' if notification.notification_type == 'success' else ('fa-triangle-exclamation' if notification.notification_type == 'warning' else 'fa-circle-info') }}" aria-hidden="true"></i>
+    </div>
+    <div class="notification-content">
+      <h2>{{ notification.title }}</h2>
+      <p>{{ notification.message }}</p>
+      <time datetime="{{ notification.created_at.isoformat() }}">{{ notification.created_at.strftime('%d %b %Y · %H:%M') }}</time>
+    </div>
+    {% if notification.related_transaction_id %}
+    <a class="btn btn-outline btn-sm" href="{{ url_for('transactions.detail', transaction_id=notification.related_transaction_id) }}">View transaction</a>
+    {% endif %}
+    {% if not notification.is_read %}
+    <form method="post" action="{{ url_for('notifications.mark_read', notification_id=notification.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn btn-outline btn-sm" type="submit">Mark read</button>
+    </form>
+    {% else %}
+    <span class="notification-read-label">Read</span>
+    {% endif %}
+  </article>
+  {% else %}
+  <div class="card"><div class="card-body empty-state">
+    <div class="empty-icon"><i class="fa-regular fa-bell" aria-hidden="true"></i></div>
+    <h2>No notifications yet</h2>
+    <p class="text-muted">Account updates will appear here.</p>
+  </div></div>
+  {% endfor %}
+</section>
+{% endblock %}

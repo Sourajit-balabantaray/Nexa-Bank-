@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="dashboard-welcome">
+  <div>
+    <h1>{{ greeting }}, {{ current_user.full_name.split()[0] }}</h1>
+    <p class="text-muted">Your account overview and recent activity.</p>
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('transactions.transfer') }}">
+    <i class="fa-solid fa-arrow-right-arrow-left" aria-hidden="true"></i> New transfer
+  </a>
+</section>
+
+{% if unusual_txns %}
+<div class="alert alert-warning dashboard-alert" role="status">
+  <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+  <div>
+    <strong>Unusual activity detected</strong>
+    <p>{{ unusual_txns|length }} recent transaction(s) appear larger than your typical activity.
+      <a href="{{ url_for('analytics.index') }}">Review insights</a>
+    </p>
+  </div>
+</div>
+{% endif %}
+
+<section class="dashboard-summary-grid" aria-label="Financial summary">
+  <article class="dashboard-summary-card dashboard-summary-balance">
+    <span class="dashboard-summary-label">Total balance</span>
+    <strong>₹{{ "{:,.2f}".format(stats.total_balance) }}</strong>
+    <span class="dashboard-summary-foot">Across your accounts</span>
+  </article>
+  <article class="dashboard-summary-card">
+    <span class="dashboard-summary-label">Available balance</span>
+    <strong>₹{{ "{:,.2f}".format(stats.available_balance) }}</strong>
+    <span class="dashboard-summary-foot">Ready to use</span>
+  </article>
+  <article class="dashboard-summary-card">
+    <span class="dashboard-summary-label">Savings balance</span>
+    <strong>₹{{ "{:,.2f}".format(stats.savings_balance) }}</strong>
+    <span class="dashboard-summary-foot">Savings accounts</span>
+  </article>
+  <article class="dashboard-summary-card">
+    <span class="dashboard-summary-label">Monthly income</span>
+    <strong>₹{{ "{:,.2f}".format(stats.monthly_income) }}</strong>
+    <span class="dashboard-summary-foot">This month</span>
+  </article>
+  <article class="dashboard-summary-card">
+    <span class="dashboard-summary-label">Monthly expenses</span>
+    <strong>₹{{ "{:,.2f}".format(stats.monthly_expenses) }}</strong>
+    <span class="dashboard-summary-foot">This month</span>
+  </article>
+</section>
+
+<section class="card dashboard-actions-card">
+  <div class="card-header">
+    <h2 class="card-title">Quick actions</h2>
+  </div>
+  <div class="card-body">
+    <div class="dashboard-actions-grid">
+      <a href="{{ url_for('transactions.transfer') }}" class="quick-action">
+        <span class="quick-action-icon"><i class="fa-solid fa-arrow-right-arrow-left" aria-hidden="true"></i></span>
+        <span class="quick-action-label">Transfer</span>
+      </a>
+      <a href="{{ url_for('transactions.deposit') }}" class="quick-action">
+        <span class="quick-action-icon"><i class="fa-solid fa-circle-plus" aria-hidden="true"></i></span>
+        <span class="quick-action-label">Deposit</span>
+      </a>
+      <a href="{{ url_for('transactions.withdraw') }}" class="quick-action">
+        <span class="quick-action-icon"><i class="fa-solid fa-circle-minus" aria-hidden="true"></i></span>
+        <span class="quick-action-label">Withdraw</span>
+      </a>
+      <a href="{{ url_for('transactions.pay_bills') }}" class="quick-action">
+        <span class="quick-action-icon"><i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i></span>
+        <span class="quick-action-label">Pay bills</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+{% if account %}
+<section class="card dashboard-activity-chart">
+  <div class="card-header"><h2 class="card-title">Income &amp; expenses</h2><a href="{{ url_for('analytics.index') }}" class="btn btn-outline btn-sm">View analytics</a></div>
+  <div class="card-body"><div class="dashboard-chart-wrap"><canvas id="dashboardIncomeExpensesChart" aria-label="Income and expenses for the last six months"></canvas></div></div>
+</section>
+{% endif %}
+
+{% if account %}
+<section class="dashboard-account-summary">
+  <div>
+    <span class="dashboard-summary-label">Primary account</span>
+    <strong>{{ account.account_type|title }} · {{ account.masked_number }}</strong>
+  </div>
+  <span class="badge {{ 'badge-success' if account.status == 'active' else 'badge-warning' }}">{{ account.status|title }}</span>
+  <a href="{{ url_for('accounts.index') }}" class="btn btn-outline btn-sm">View accounts</a>
+</section>
+{% endif %}
+
+<section class="card dashboard-transactions-card">
+  <div class="card-header">
+    <h2 class="card-title">Recent transactions</h2>
+    <a href="{{ url_for('transactions.history') }}" class="btn btn-outline btn-sm">View all</a>
+  </div>
+  {% if recent_transactions %}
+  <div class="table-wrapper">
+    <table class="table">
+      <thead>
+        <tr><th>Date</th><th>Description</th><th>Category</th><th>Amount</th><th>Type</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        {% for txn in recent_transactions %}
+        <tr>
+          <td><time datetime="{{ txn.created_at.isoformat() }}">{{ txn.created_at.strftime('%d %b %Y') }}</time></td>
+          <td>
+            <a href="{{ url_for('transactions.detail', transaction_id=txn.transaction_id) }}" class="transaction-description">
+              {{ txn.description or 'Transaction' }}
+            </a>
+            <small class="transaction-reference">{{ txn.transaction_id[:16] }}...</small>
+          </td>
+          <td>{{ txn.category|title }}</td>
+          <td class="{{ 'amount-credit' if txn.is_credit else 'amount-debit' }}">
+            {{ '+' if txn.is_credit else '-' }}₹{{ "{:,.2f}".format(txn.amount) }}
+          </td>
+          <td><span class="badge {{ 'badge-credit' if txn.is_credit else 'badge-debit' }}">{{ txn.transaction_type|title }}</span></td>
+          <td><span class="badge status-badge status-{{ txn.status }}">{{ txn.status|title }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="card-body empty-state">
+    <h3>No transactions yet</h3>
+    <p class="text-muted">Your recent account activity will appear here.</p>
+    <a href="{{ url_for('transactions.deposit') }}" class="btn btn-outline">Record a deposit</a>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

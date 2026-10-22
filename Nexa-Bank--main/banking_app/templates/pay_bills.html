@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Pay Bills{% endblock %}
+{% block page_title %}Pay Bills{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <h1>Pay a bill</h1>
+    <p class="text-muted">Available balance: ₹{{ "{:,.2f}".format(account.balance) }}</p>
+  </div>
+</div>
+<section class="card bill-payment-card narrow-form-card">
+  <div class="card-header"><h2 class="card-title">Bill details</h2></div>
+  <div class="card-body">
+    <p class="bill-simulation-note">Bill payments are recorded in this app only. No external provider is contacted.</p>
+    <form method="post" action="{{ url_for('transactions.pay_bills') }}" data-confirm="Review the bill details and amount before recording this payment. Continue?">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-group">
+        <label class="form-label" for="bill_type">Bill type</label>
+        <select class="form-control" id="bill_type" name="bill_type" required>
+          <option value="">Choose a bill type</option>
+          {% for bill_type in bill_types %}<option value="{{ bill_type }}">{{ bill_type }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="biller_reference">Biller or account reference</label>
+        <input class="form-control" id="biller_reference" name="biller_reference" maxlength="100" required autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="amount">Amount (₹)</label>
+        <input class="form-control" id="amount" name="amount" type="number" min="0.01" max="{{ account.balance }}" step="0.01" required>
+      </div>
+      <button class="btn btn-primary" type="submit"><i class="fa-solid fa-lock"></i> Record bill payment</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

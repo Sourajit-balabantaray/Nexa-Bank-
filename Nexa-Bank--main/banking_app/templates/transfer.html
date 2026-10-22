@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Transfer{% endblock %}
+{% block page_title %}Transfer{% endblock %}
+{% block content %}
+<div class="page-heading"><h1>Transfer funds</h1><p class="text-muted">Available balance: ₹{{ "{:,.2f}".format(account.balance) }}. Simulation only; no real funds are transferred.</p></div>
+<section class="card tw-card narrow-form-card"><div class="card-body">
+  <form method="post" action="{{ url_for('transactions.transfer') }}" data-confirm="Review the recipient and amount before sending. Continue with this transfer?">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% for name, label in [('receiver_name', 'Recipient name'), ('receiver_account', 'Recipient account number'), ('confirm_account', 'Confirm account number'), ('ifsc', 'IFSC code')] %}
+    <div class="form-group"><label class="form-label" for="{{ name }}">{{ label }}</label><input class="form-control" id="{{ name }}" name="{{ name }}" value="{{ form_data.get(name, '') }}" {% if name != 'ifsc' %}required{% endif %}></div>
+    {% endfor %}
+    <div class="form-group"><label class="form-label" for="amount">Amount (₹)</label><input class="form-control" id="amount" name="amount" type="number" min="0.01" max="{{ account.balance }}" step="0.01" required></div>
+    <div class="form-group"><label class="form-label" for="transfer_type">Transfer method</label><select class="form-control" id="transfer_type" name="transfer_type"><option value="bank">Bank transfer</option><option value="upi">UPI</option><option value="internal">Internal</option></select></div>
+    <div class="form-group"><label class="form-label" for="description">Description</label><input class="form-control" id="description" name="description" maxlength="255"></div>
+    <button class="btn btn-primary" type="submit">Transfer funds</button>
+  </form>
+</div></section>
+{% endblock %}

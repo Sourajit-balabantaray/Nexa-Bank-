@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block page_title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="page-heading"><h1>Administration</h1><p class="text-muted">NexaBank activity overview.</p></div>
+<div class="card-grid">
+  <section class="card tw-card"><div class="card-body"><h2>Customers</h2><strong>{{ total_customers }}</strong></div></section>
+  <section class="card tw-card"><div class="card-body"><h2>Accounts</h2><strong>{{ total_accounts }}</strong></div></section>
+  <section class="card tw-card"><div class="card-body"><h2>Transactions</h2><strong>{{ total_transactions }}</strong></div></section>
+  <section class="card tw-card"><div class="card-body"><h2>Total credits</h2><strong>₹{{ "{:,.2f}".format(total_deposits) }}</strong></div></section>
+  <section class="card tw-card"><div class="card-body"><h2>Total debits</h2><strong>₹{{ "{:,.2f}".format(total_withdrawals) }}</strong></div></section>
+</div>
+<section class="card"><div class="card-body"><h2>Transactions in the last 7 days</h2><div style="height:280px"><canvas id="adminTxnChart" data-labels="{{ chart_labels|tojson|forceescape }}" data-values="{{ chart_data|tojson|forceescape }}"></canvas></div></div></section>
+<p style="margin:16px 0"><a class="btn btn-outline" href="{{ url_for('admin.users') }}">Manage customers</a> <a class="btn btn-outline" href="{{ url_for('admin.transactions') }}">View transactions</a></p>
+<div class="card-grid">
+  <section class="card"><div class="card-header"><h2 class="card-title">Recent customers</h2></div><div class="card-body">{% for user in recent_customers %}<p>{{ user.full_name }} · {{ user.customer_id }}</p>{% else %}<p>No customers yet.</p>{% endfor %}</div></section>
+  <section class="card"><div class="card-header"><h2 class="card-title">Recent transactions</h2></div><div class="card-body">{% for txn in recent_txns %}<p>{{ txn.transaction_id }} · {{ txn.transaction_type|title }} ₹{{ "{:,.2f}".format(txn.amount) }}</p>{% else %}<p>No transactions yet.</p>{% endfor %}</div></section>
+</div>
+{% endblock %}

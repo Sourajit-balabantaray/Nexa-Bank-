@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Customers{% endblock %}
+{% block page_title %}Customers{% endblock %}
+{% block content %}
+<div class="page-heading"><h1>Customers</h1><a class="btn btn-outline" href="{{ url_for('admin.dashboard') }}">Admin dashboard</a></div>
+<form method="get" class="filter-form"><div class="form-group"><label class="form-label" for="search">Search customers</label><input id="search" name="search" class="form-control" value="{{ search }}" placeholder="Name, email, phone, or customer ID"></div><button class="btn btn-primary" type="submit">Search</button></form>
+<section class="card"><div class="table-wrapper"><table class="table"><thead><tr><th>Customer</th><th>Email</th><th>Phone</th><th>Joined</th><th>Status</th></tr></thead><tbody>
+{% for user in users %}<tr><td>{{ user.full_name }}<br><small>{{ user.customer_id }}</small></td><td>{{ user.email }}</td><td>{{ user.phone }}</td><td>{{ user.created_at.strftime('%d %b %Y') }}</td><td>{{ 'Active' if user.is_active else 'Disabled' }}</td></tr>{% else %}<tr><td colspan="5">No customers found.</td></tr>{% endfor %}
+</tbody></table></div></section>
+{% if pagination.pages > 1 %}<nav class="pagination"><span>Page {{ pagination.page }} of {{ pagination.pages }}</span>{% if pagination.has_prev %}<a class="btn btn-outline btn-sm" href="{{ url_for('admin.users', page=pagination.prev_num, search=search) }}">Previous</a>{% endif %}{% if pagination.has_next %}<a class="btn btn-outline btn-sm" href="{{ url_for('admin.users', page=pagination.next_num, search=search) }}">Next</a>{% endif %}</nav>{% endif %}
+{% endblock %}

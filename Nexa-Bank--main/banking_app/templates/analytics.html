@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Analytics{% endblock %}
+{% block page_title %}Analytics{% endblock %}
+{% block content %}
+<section class="analytics-heading">
+  <div>
+    <p class="analytics-eyebrow">YOUR MONEY, AT A GLANCE</p>
+    <h1>Financial overview</h1>
+    <p class="text-muted">Explore income, spending and balance trends from your account activity.</p>
+  </div>
+  {% if account %}
+  <div class="analytics-period" role="group" aria-label="Select analytics time period">
+    <button class="period-btn" type="button" data-period="7d" aria-pressed="false">7 days</button>
+    <button class="period-btn active" type="button" data-period="30d" aria-pressed="true">30 days</button>
+    <button class="period-btn" type="button" data-period="6m" aria-pressed="false">6 months</button>
+    <button class="period-btn" type="button" data-period="1y" aria-pressed="false">1 year</button>
+  </div>
+  {% endif %}
+</section>
+
+{% if account %}
+<p class="analytics-period-caption">Showing <strong id="analyticsPeriodLabel">the last 30 days</strong> for your primary account.</p>
+
+<section class="analytics-kpis" aria-label="Financial summary">
+  <article class="analytics-kpi">
+    <span class="analytics-kpi-icon income"><i class="fa-solid fa-arrow-down" aria-hidden="true"></i></span>
+    <span class="analytics-kpi-label">Money in</span>
+    <strong id="totalIncome">₹0.00</strong>
+    <span class="analytics-kpi-note">Credits received</span>
+  </article>
+  <article class="analytics-kpi">
+    <span class="analytics-kpi-icon expenses"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></span>
+    <span class="analytics-kpi-label">Money out</span>
+    <strong id="totalExpenses">₹0.00</strong>
+    <span class="analytics-kpi-note" id="expenseComparison">Debits and spending</span>
+  </article>
+  <article class="analytics-kpi">
+    <span class="analytics-kpi-icon savings"><i class="fa-solid fa-scale-balanced" aria-hidden="true"></i></span>
+    <span class="analytics-kpi-label">Net cash flow</span>
+    <strong id="totalSavings">₹0.00</strong>
+    <span class="analytics-kpi-note">Money in minus money out</span>
+  </article>
+  <article class="analytics-kpi">
+    <span class="analytics-kpi-icon rate"><i class="fa-solid fa-piggy-bank" aria-hidden="true"></i></span>
+    <span class="analytics-kpi-label">Savings rate</span>
+    <strong id="savingsRate">0%</strong>
+    <span class="analytics-kpi-note">Net cash flow as a share of income</span>
+  </article>
+</section>
+
+{% if unusual_txns %}
+<div class="analytics-alert" role="status">
+  <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+  <span><strong>Review larger transactions.</strong> {{ unusual_txns|length }} debit(s) are notably larger than your account's average debit.</span>
+</div>
+{% endif %}
+
+<section class="analytics-insights" aria-label="Personalized insights">
+  {% for insight in insights %}
+  <article class="analytics-insight">
+    <span class="analytics-insight-icon"><i class="fa-solid {{ insight.icon }}" aria-hidden="true"></i></span>
+    <div><h2>{{ insight.title }}</h2><p>{{ insight.message }}</p></div>
+  </article>
+  {% endfor %}
+</section>
+
+<section class="analytics-charts" aria-label="Financial charts">
+  <article class="analytics-chart-card analytics-chart-wide">
+    <header class="analytics-chart-header">
+      <div><h2>Income &amp; expenses</h2><p>Compare money in and out over time</p></div>
+      <span class="analytics-chart-tag" id="cashflowChartPeriod">Last 30 days</span>
+    </header>
+    <div class="analytics-chart-wrap"><canvas id="incomeExpensesChart" aria-label="Income and expenses over selected period"></canvas><p class="analytics-chart-empty" hidden>No cash flow activity in this period.</p></div>
+  </article>
+  <article class="analytics-chart-card">
+    <header class="analytics-chart-header">
+      <div><h2>Where your money goes</h2><p>Spending by category</p></div>
+    </header>
+    <div class="analytics-chart-wrap analytics-chart-doughnut"><canvas id="categoryChart" aria-label="Spending by category"></canvas><p class="analytics-chart-empty" hidden>No spending activity in this period.</p></div>
+  </article>
+  <article class="analytics-chart-card">
+    <header class="analytics-chart-header">
+      <div><h2>Balance movement</h2><p>End-of-day balance after recorded transactions</p></div>
+    </header>
+    <div class="analytics-chart-wrap"><canvas id="balanceHistoryChart" aria-label="Account balance over selected period"></canvas><p class="analytics-chart-empty" hidden>No balance activity in this period.</p></div>
+  </article>
+</section>
+<p class="analytics-disclaimer">Figures reflect recorded account transactions and are for informational purposes only.</p>
+{% else %}
+<div class="card"><div class="card-body empty-state"><h2>No active account</h2><p>Analytics will appear when an account is available.</p></div></div>
+{% endif %}
+{% endblock %}

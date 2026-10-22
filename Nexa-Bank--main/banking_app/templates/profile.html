@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Profile & Settings{% endblock %}
+{% block page_title %}Profile & Settings{% endblock %}
+{% block content %}
+<div class="settings-heading">
+  <div><p class="analytics-eyebrow">ACCOUNT PREFERENCES</p><h1>Settings</h1><p class="text-muted">Manage your profile, appearance, security and verification.</p></div>
+</div>
+<nav class="settings-shortcuts" aria-label="Settings sections">
+  <a href="#profile-settings" class="settings-shortcut">
+    <span class="settings-shortcut-icon"><i class="fa-solid fa-user-pen" aria-hidden="true"></i></span>
+    <span><strong>Profile &amp; appearance</strong><small>Personal details and light/dark theme</small></span>
+    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+  </a>
+  <a href="#password-settings" class="settings-shortcut">
+    <span class="settings-shortcut-icon security"><i class="fa-solid fa-lock" aria-hidden="true"></i></span>
+    <span><strong>Password</strong><small>Change your sign-in password</small></span>
+    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+  </a>
+  <a href="#security-settings" class="settings-shortcut">
+    <span class="settings-shortcut-icon pin"><i class="fa-solid fa-key" aria-hidden="true"></i></span>
+    <span><strong>Transaction PIN</strong><small>Update your 4-digit transaction PIN</small></span>
+    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+  </a>
+  <a href="#privacy-settings" class="settings-shortcut">
+    <span class="settings-shortcut-icon identity"><i class="fa-solid fa-id-card" aria-hidden="true"></i></span>
+    <span><strong>Identity verification</strong><small>Review document status securely</small></span>
+    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+  </a>
+</nav>
+<div class="settings-form-grid">
+  <section class="card tw-card" id="profile-settings">
+    <div class="card-header"><div><h2 class="card-title">Personal information</h2><p class="settings-card-description">Keep your contact details up to date.</p></div><span class="settings-card-mark"><i class="fa-solid fa-user-pen" aria-hidden="true"></i></span></div>
+    <div class="card-body">
+      <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="update_personal">
+        <div class="settings-field-grid">
+        {% for name, label, value in [('full_name', 'Full name', current_user.full_name), ('address', 'Address', current_user.address or ''), ('city', 'City', current_user.city or ''), ('state', 'State', current_user.state or ''), ('postal_code', 'Postal code', current_user.postal_code or '')] %}
+        <div class="form-group"><label class="form-label" for="{{ name }}">{{ label }}</label><input class="form-control" id="{{ name }}" name="{{ name }}" value="{{ value }}" {% if name == 'full_name' %}required minlength="2"{% endif %}></div>
+        {% endfor %}
+        <div class="form-group"><label class="form-label" for="theme">Appearance</label><select class="form-control" id="theme" name="theme"><option value="light" {% if current_user.theme == 'light' %}selected{% endif %}>Light theme</option><option value="dark" {% if current_user.theme == 'dark' %}selected{% endif %}>Dark theme</option></select><small class="settings-help">Choose the theme used across your banking workspace.</small></div>
+        </div>
+        <div class="settings-form-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Save changes</button></div>
+      </form>
+    </div>
+  </section>
+  <section class="card tw-card" id="password-settings">
+    <div class="card-header"><div><h2 class="card-title">Change password</h2><p class="settings-card-description">Use a strong, unique sign-in password.</p></div><span class="settings-card-mark security"><i class="fa-solid fa-lock" aria-hidden="true"></i></span></div>
+    <div class="card-body"><form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="change_password">
+      <div class="form-group"><label class="form-label" for="current-password">Current password</label><input class="form-control" id="current-password" type="password" name="current_password" required autocomplete="current-password"></div>
+      <div class="form-group"><label class="form-label" for="new-password">New password</label><input class="form-control" id="new-password" type="password" name="new_password" required autocomplete="new-password"></div>
+      <div class="form-group"><label class="form-label" for="confirm-password">Confirm password</label><input class="form-control" id="confirm-password" type="password" name="confirm_password" required autocomplete="new-password"></div>
+      <div class="settings-form-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Update password</button></div>
+    </form></div>
+  </section>
+  <section class="card tw-card" id="security-settings">
+    <div class="card-header"><div><h2 class="card-title">Change transaction PIN</h2><p class="settings-card-description">Protect your account transactions.</p></div><span class="settings-card-mark pin"><i class="fa-solid fa-key" aria-hidden="true"></i></span></div>
+    <div class="card-body"><form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="change_pin">
+      <div class="form-group"><label class="form-label" for="current-pin">Current PIN</label><input class="form-control" id="current-pin" type="password" name="current_pin" inputmode="numeric" maxlength="4" autocomplete="current-password" required></div>
+      <div class="form-group"><label class="form-label" for="new-pin">New 4-digit PIN</label><input class="form-control" id="new-pin" type="password" name="new_pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" required></div>
+      <div class="form-group"><label class="form-label" for="confirm-pin">Confirm PIN</label><input class="form-control" id="confirm-pin" type="password" name="confirm_pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" required></div>
+      <div class="settings-form-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-key" aria-hidden="true"></i> Update PIN</button></div>
+    </form></div>
+  </section>
+</div>
+{% if account %}<p class="text-muted" style="margin-top:16px">Primary account: {{ account.masked_number }}</p>{% endif %}
+<section class="card tw-card kyc-account-status settings-identity-card" id="privacy-settings">
+  <div class="card-header"><div><h2 class="card-title">Identity verification</h2><p class="settings-card-description">Check document review status and access your submitted files.</p></div><span class="settings-card-mark identity"><i class="fa-solid fa-id-card" aria-hidden="true"></i></span></div>
+  <div class="card-body">
+    {% if documents %}
+    <div class="kyc-document-list">
+      {% for document in documents %}
+      <article class="kyc-document-row">
+        <div>
+          <h3>{{ 'Photograph' if document.document_type == 'photograph' else document.document_type|title ~ ' proof' }}</h3>
+          {% if document.rejection_reason %}<p class="kyc-rejection-reason">Reason: {{ document.rejection_reason }}</p>{% endif %}
+        </div>
+        <span class="kyc-status status-{{ document.status }}">{{ document.status|title if document.status != 'pending' else 'Pending Verification' }}</span>
+        <a class="btn btn-outline btn-sm" href="{{ url_for('documents.download', document_id=document.id) }}">Download securely</a>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted">No verification documents are on file.</p>
+    {% endif %}
+    <p class="text-muted" style="margin-top:12px">Documents are encrypted at rest and visible only to you and authorized administrators.</p>
+  </div>
+</section>
+{% endblock %}

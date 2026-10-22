@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}All Transactions{% endblock %}
+{% block page_title %}All Transactions{% endblock %}
+{% block content %}
+<div class="page-heading"><h1>All transactions</h1><a class="btn btn-outline" href="{{ url_for('admin.dashboard') }}">Admin dashboard</a></div>
+<form method="get" class="filter-form"><div class="form-group"><label class="form-label" for="search">Search</label><input class="form-control" id="search" name="search" value="{{ search }}" placeholder="Transaction reference or description"></div><div class="form-group"><label class="form-label" for="type">Type</label><select class="form-control" id="type" name="type"><option value="">All</option><option value="credit" {% if filters.type == 'credit' %}selected{% endif %}>Credit</option><option value="debit" {% if filters.type == 'debit' %}selected{% endif %}>Debit</option></select></div><div class="form-group"><label class="form-label" for="category">Category</label><input class="form-control" id="category" name="category" value="{{ filters.category }}"></div><button class="btn btn-primary" type="submit">Filter</button></form>
+<section class="card"><div class="table-wrapper"><table class="table"><thead><tr><th>Date</th><th>Reference</th><th>Account</th><th>Description</th><th>Category</th><th>Type</th><th>Amount</th></tr></thead><tbody>
+{% for txn in transactions %}<tr><td>{{ txn.created_at.strftime('%d %b %Y %H:%M') }}</td><td>{{ txn.transaction_id }}</td><td>{{ txn.account.masked_number }}</td><td>{{ txn.description or '—' }}</td><td>{{ txn.category|title }}</td><td>{{ txn.transaction_type|title }}</td><td>₹{{ "{:,.2f}".format(txn.amount) }}</td></tr>{% else %}<tr><td colspan="7">No transactions found.</td></tr>{% endfor %}
+</tbody></table></div></section>
+{% if pagination.pages > 1 %}<nav class="pagination"><span>Page {{ pagination.page }} of {{ pagination.pages }}</span>{% if pagination.has_prev %}<a class="btn btn-outline btn-sm" href="{{ url_for('admin.transactions', page=pagination.prev_num, search=search, type=filters.type, category=filters.category) }}">Previous</a>{% endif %}{% if pagination.has_next %}<a class="btn btn-outline btn-sm" href="{{ url_for('admin.transactions', page=pagination.next_num, search=search, type=filters.type, category=filters.category) }}">Next</a>{% endif %}</nav>{% endif %}
+{% endblock %}

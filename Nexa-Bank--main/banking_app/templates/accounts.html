@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Accounts{% endblock %}
+{% block page_title %}Accounts{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <h1>Your Accounts</h1>
+    <p class="text-muted">Manage your accounts and balances.</p>
+  </div>
+</div>
+{% if accounts %}
+<section class="account-overview" aria-label="Account balance summary">
+  <article class="account-overview-card account-overview-primary">
+    <span class="account-overview-label">Total balance</span>
+    <strong>₹{{ "{:,.2f}".format(total_balance) }}</strong>
+    <span class="account-overview-note">{{ accounts|length }} account{{ '' if accounts|length == 1 else 's' }}</span>
+  </article>
+  <article class="account-overview-card">
+    <span class="account-overview-label">Available balance</span>
+    <strong>₹{{ "{:,.2f}".format(available_balance) }}</strong>
+    <span class="account-overview-note">Ready to use</span>
+  </article>
+</section>
+<div class="account-list">
+  {% for account in accounts %}
+  <article class="account-detail-card">
+    <div class="account-visual">
+      <div class="account-visual-top">
+        <span class="account-brand"><i class="fa-solid fa-landmark" aria-hidden="true"></i> NexaBank</span>
+        <span class="badge {{ 'badge-success' if account.status == 'active' else 'badge-warning' }}">{{ account.status|title }}</span>
+      </div>
+      <div class="account-visual-type">{{ account.account_type|title }} account</div>
+      <div class="account-visual-number" aria-label="Masked account number">{{ account.masked_number }}</div>
+      <div class="account-visual-footer">
+        <div><span>Account holder</span><strong>{{ current_user.full_name }}</strong></div>
+        <div><span>Available balance</span><strong>₹{{ "{:,.2f}".format(account.available_balance) }}</strong></div>
+      </div>
+    </div>
+    <div class="account-information">
+      <div class="account-information-heading">
+        <div><h2>{{ account.account_type|title }} Account</h2><p class="text-muted">Account details</p></div>
+        <button class="btn btn-outline btn-sm copy-account-btn" type="button"
+                data-copy="{{ account.masked_number }}" aria-label="Copy masked account number">
+          <i class="fa-regular fa-copy" aria-hidden="true"></i> Copy masked number
+        </button>
+      </div>
+      <dl class="account-detail-list">
+        <div><dt>Account number</dt><dd>{{ account.masked_number }}</dd></div>
+        <div><dt>IFSC code</dt><dd><button class="account-copy-value" type="button" data-copy="{{ account.ifsc_code }}" aria-label="Copy IFSC code">{{ account.ifsc_code }} <i class="fa-regular fa-copy" aria-hidden="true"></i></button></dd></div>
+        <div><dt>Account type</dt><dd>{{ account.account_type|title }}</dd></div>
+        <div><dt>Account balance</dt><dd>₹{{ "{:,.2f}".format(account.balance) }}</dd></div>
+        <div><dt>Opened on</dt><dd>{{ account.opening_date.strftime('%d %b %Y') if account.opening_date else '—' }}</dd></div>
+        <div><dt>Nominee</dt><dd>{% if account.nominee_name %}{{ account.nominee_name }}{% if account.nominee_relationship %} · {{ account.nominee_relationship|title }}{% endif %}{% else %}Not provided{% endif %}</dd></div>
+      </dl>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card tw-card"><div class="card-body empty-state"><div class="empty-icon"><i class="fa-solid fa-credit-card" aria-hidden="true"></i></div><h2>No accounts found</h2><p class="text-muted">Your account details will appear here.</p></div></div>
+{% endif %}
+{% endblock %}

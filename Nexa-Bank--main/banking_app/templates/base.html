@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ current_user.theme if current_user.is_authenticated else 'light' }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NexaBank — Manage accounts, track transactions, and explore your finances.">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+
+  <title>{% block title %}NexaBank{% endblock %}</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind.css', v='nexabank-ui-v14') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='nexabank-ui-v14') }}">
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% if current_user.is_authenticated %}
+<!-- ── Sidebar ── -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<aside class="sidebar" id="sidebar" aria-label="Main navigation">
+  <!-- Brand -->
+  <div class="sidebar-brand">
+    <div class="brand-icon"><i class="fa-solid fa-landmark"></i></div>
+    <div class="brand-text">
+      <span class="brand-name">NexaBank</span>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav" aria-label="Main navigation">
+    <div class="nav-section-label">Main</div>
+    <a href="{{ url_for('dashboard.index') }}" class="sidebar-link">
+      <i class="fa-solid fa-gauge-high" aria-hidden="true"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="{{ url_for('accounts.index') }}" class="sidebar-link">
+      <i class="fa-solid fa-credit-card" aria-hidden="true"></i>
+      <span>Accounts</span>
+    </a>
+
+    <div class="nav-section-label">Transactions</div>
+    <a href="{{ url_for('transactions.history') }}" class="sidebar-link">
+      <i class="fa-solid fa-list-ul" aria-hidden="true"></i>
+      <span>History</span>
+    </a>
+    <a href="{{ url_for('transactions.transfer') }}" class="sidebar-link">
+      <i class="fa-solid fa-arrows-left-right" aria-hidden="true"></i>
+      <span>Transfer</span>
+    </a>
+    <a href="{{ url_for('transactions.deposit') }}" class="sidebar-link">
+      <i class="fa-solid fa-circle-plus" aria-hidden="true"></i>
+      <span>Deposit</span>
+    </a>
+    <a href="{{ url_for('transactions.withdraw') }}" class="sidebar-link">
+      <i class="fa-solid fa-circle-minus" aria-hidden="true"></i>
+      <span>Withdraw</span>
+    </a>
+    <a href="{{ url_for('transactions.pay_bills') }}" class="sidebar-link">
+      <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i>
+      <span>Pay Bills</span>
+    </a>
+
+    <div class="nav-section-label">Insights</div>
+    <a href="{{ url_for('analytics.index') }}" class="sidebar-link">
+      <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+      <span>Analytics</span>
+    </a>
+    <a href="{{ url_for('statements.index') }}" class="sidebar-link">
+      <i class="fa-solid fa-file-invoice" aria-hidden="true"></i>
+      <span>Statements</span>
+    </a>
+    <a href="{{ url_for('notifications.index') }}" class="sidebar-link">
+      <i class="fa-regular fa-bell" aria-hidden="true"></i>
+      <span>Notifications</span>
+      {% set unread_notifications = current_user.notifications.filter_by(is_read=False).count() %}
+      {% if unread_notifications %}<span class="nav-notification-count">{{ unread_notifications }}</span>{% endif %}
+    </a>
+
+    <div class="nav-section-label">Profile &amp; Settings</div>
+    <a href="{{ url_for('accounts.profile') }}" class="sidebar-link">
+      <i class="fa-solid fa-user" aria-hidden="true"></i>
+      <span>Profile</span>
+    </a>
+    <a href="{{ url_for('accounts.profile') }}#security-settings" class="sidebar-link">
+      <i class="fa-solid fa-gear" aria-hidden="true"></i>
+      <span>Settings</span>
+    </a>
+    <a href="{{ url_for('auth.logout') }}" class="sidebar-link">
+      <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
+      <span>Log out</span>
+    </a>
+
+    {% if current_user.is_admin %}
+    <div class="nav-section-label">Admin</div>
+    <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link">
+      <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+      <span>Admin Panel</span>
+    </a>
+    <a href="{{ url_for('admin.kyc_review') }}" class="sidebar-link">
+      <i class="fa-solid fa-id-card" aria-hidden="true"></i>
+      <span>KYC Review</span>
+    </a>
+    {% endif %}
+  </nav>
+
+  <!-- User Footer -->
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="user-avatar" aria-hidden="true">{{ current_user.full_name[0].upper() }}</div>
+      <div class="user-info">
+        <div class="user-name">{{ current_user.full_name }}</div>
+        <div class="user-role">{{ current_user.customer_id }}</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── Main Content ── -->
+<div class="main-content" id="mainContent">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">
+        <i class="fa-solid fa-bars" aria-hidden="true"></i>
+      </button>
+      <span class="page-title">{% block page_title %}Dashboard{% endblock %}</span>
+    </div>
+
+    <div class="topbar-right">
+      <!-- Theme Toggle -->
+      <button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle dark/light mode" aria-pressed="false"></button>
+
+      <a href="{{ url_for('notifications.index') }}" class="topbar-btn notification-control" title="Notifications" aria-label="Notifications">
+        <i class="fa-regular fa-bell" aria-hidden="true"></i>
+        {% set unread_notifications = current_user.notifications.filter_by(is_read=False).count() %}
+        {% if unread_notifications %}<span class="notification-dot" aria-label="{{ unread_notifications }} unread"></span>{% endif %}
+      </a>
+
+      <details class="profile-menu">
+        <summary class="topbar-btn profile-menu-trigger" aria-label="Open profile menu">
+          <span class="user-avatar" aria-hidden="true">{{ current_user.full_name[0].upper() }}</span>
+        </summary>
+        <div class="profile-menu-panel">
+          <strong>{{ current_user.full_name }}</strong>
+          <span>{{ current_user.customer_id }}</span>
+          <a href="{{ url_for('accounts.profile') }}"><i class="fa-solid fa-user" aria-hidden="true"></i> Profile &amp; settings</a>
+          <a href="{{ url_for('auth.logout') }}"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i> Log out</a>
+        </div>
+      </details>
+
+    </div>
+  </header>
+
+  <!-- Flash Messages as hidden elements for Toast -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+  <div class="flash-message" data-type="{{ category }}" data-message="{{ message }}" style="display:none"></div>
+  {% endfor %}
+{% endwith %}
+{% endif %}
+
+{% if current_user.is_authenticated %}<main class="page-content mx-auto w-full max-w-7xl">{% endif %}
+{% block content %}{% endblock %}
+{% if current_user.is_authenticated %}</main></div>{% endif %}
+
+{% include '_support_chat.html' %}
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<!-- Custom JS -->
+<script src="{{ url_for('static', filename='js/main.js', v='nexabank-ui-v14') }}"></script>
+<script src="{{ url_for('static', filename='js/validation.js', v='nexabank-ui-v14') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js', v='nexabank-ui-v14') }}"></script>
+<script src="{{ url_for('static', filename='js/support_chat.js', v='nexabank-rag-v3') }}"></script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

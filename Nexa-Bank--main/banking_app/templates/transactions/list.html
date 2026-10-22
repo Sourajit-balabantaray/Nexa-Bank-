@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Transactions{% endblock %}
+{% block page_title %}Transaction History{% endblock %}
+{% block content %}
+<div class="page-heading"><h1>Transaction history</h1>{% if account %}<p class="text-muted">Account {{ account.masked_number }}</p>{% endif %}</div>
+<section class="card"><div class="card-body">
+  <form method="get" class="filter-form">
+    <div class="form-group"><label class="form-label" for="transaction-search">Search</label><input id="transaction-search" class="form-control" name="search" placeholder="Description, category or reference" value="{{ (filters|default({})).get('search', '') }}"></div>
+    <div class="form-group"><label class="form-label">Category</label><select class="form-control" name="category"><option value="">All</option>{% for category in categories %}<option value="{{ category }}" {% if (filters|default({})).get('category') == category %}selected{% endif %}>{{ category|title }}</option>{% endfor %}</select></div>
+    <div class="form-group"><label class="form-label">Type</label><select class="form-control" name="type"><option value="">All</option><option value="credit" {% if (filters|default({})).get('type') == 'credit' %}selected{% endif %}>Credit</option><option value="debit" {% if (filters|default({})).get('type') == 'debit' %}selected{% endif %}>Debit</option></select></div>
+    <div class="form-group"><label class="form-label" for="transaction-status">Status</label><select id="transaction-status" class="form-control" name="status"><option value="">All</option>{% for status in ['success', 'pending', 'failed'] %}<option value="{{ status }}" {% if (filters|default({})).get('status') == status %}selected{% endif %}>{{ status|title }}</option>{% endfor %}</select></div>
+    <div class="form-group"><label class="form-label">From</label><input class="form-control" type="date" name="date_from" value="{{ (filters|default({})).get('date_from', '') }}"></div>
+    <div class="form-group"><label class="form-label">To</label><input class="form-control" type="date" name="date_to" value="{{ (filters|default({})).get('date_to', '') }}"></div>
+    <div class="form-group"><label class="form-label">Sort</label><select class="form-control" name="sort"><option value="newest">Newest</option><option value="oldest" {% if (filters|default({})).get('sort') == 'oldest' %}selected{% endif %}>Oldest</option><option value="amount_high" {% if (filters|default({})).get('sort') == 'amount_high' %}selected{% endif %}>Amount high-low</option><option value="amount_low" {% if (filters|default({})).get('sort') == 'amount_low' %}selected{% endif %}>Amount low-high</option></select></div>
+    <button class="btn btn-primary" type="submit">Apply filters</button>
+  </form>
+</div>
+{% if transactions %}
+<div class="table-wrapper"><table class="table"><thead><tr><th>Date</th><th>Reference</th><th>Description</th><th>Category</th><th>Type</th><th>Status</th><th>Amount</th><th>Balance</th></tr></thead><tbody>
+{% for txn in transactions %}<tr><td>{{ txn.created_at.strftime('%d %b %Y %H:%M') }}</td><td><a href="{{ url_for('transactions.detail', transaction_id=txn.transaction_id) }}">{{ txn.transaction_id }}</a></td><td>{{ txn.description or 'Transaction' }}</td><td>{{ txn.category|title }}</td><td><span class="badge {{ 'badge-credit' if txn.is_credit else 'badge-debit' }}">{{ txn.transaction_type|title }}</span></td><td><span class="badge status-badge status-{{ txn.status }}">{{ txn.status|title }}</span></td><td class="{{ 'amount-credit' if txn.is_credit else 'amount-debit' }}">{{ '+' if txn.is_credit else '-' }}₹{{ "{:,.2f}".format(txn.amount) }}</td><td>{% if txn.balance_after is not none %}₹{{ "{:,.2f}".format(txn.balance_after) }}{% else %}—{% endif %}</td></tr>{% endfor %}
+</tbody></table></div>
+{% else %}<div class="card-body empty-state"><h2>No transactions found</h2><p class="text-muted">Try another filter or make a deposit.</p></div>{% endif %}
+{% if pagination and pagination.pages > 1 %}<nav class="pagination">{% if pagination.has_prev %}<a class="btn btn-outline btn-sm" href="{{ url_for('transactions.history', page=pagination.prev_num, search=filters.search, category=filters.category, type=filters.type, date_from=filters.date_from, date_to=filters.date_to, sort=filters.sort) }}">Previous</a>{% endif %}<span>Page {{ pagination.page }} of {{ pagination.pages }}</span>{% if pagination.has_next %}<a class="btn btn-outline btn-sm" href="{{ url_for('transactions.history', page=pagination.next_num, search=filters.search, category=filters.category, type=filters.type, date_from=filters.date_from, date_to=filters.date_to, sort=filters.sort) }}">Next</a>{% endif %}</nav>{% endif %}
+</section>
+{% endblock %}

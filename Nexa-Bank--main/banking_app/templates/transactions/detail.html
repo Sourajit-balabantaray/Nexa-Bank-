@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Transaction Details{% endblock %}
+{% block page_title %}Transaction Details{% endblock %}
+{% block content %}
+<div class="page-heading"><h1>Transaction details</h1><p class="text-muted">{{ transaction.transaction_id }}</p></div>
+<section class="card tw-card"><div class="card-body">
+  <h2>{{ transaction.transaction_type|title }} · ₹{{ "{:,.2f}".format(transaction.amount) }}</h2>
+  <dl class="details-grid">
+    <dt>Status</dt><dd>{{ transaction.status|title }}</dd>
+    <dt>Date</dt><dd>{{ transaction.created_at.strftime('%d %B %Y, %I:%M %p UTC') }}</dd>
+    <dt>Category</dt><dd>{{ transaction.category|title }}</dd>
+    <dt>Description</dt><dd>{{ transaction.description or '—' }}</dd>
+    <dt>From</dt><dd>{{ transaction.sender or '—' }}</dd>
+    <dt>To</dt><dd>{{ transaction.receiver or '—' }}</dd>
+    <dt>Account</dt><dd>{{ account.masked_number }}</dd>
+    <dt>Balance after</dt><dd>{% if transaction.balance_after is not none %}₹{{ "{:,.2f}".format(transaction.balance_after) }}{% else %}—{% endif %}</dd>
+  </dl>
+  <a class="btn btn-primary" href="{{ url_for('transactions.download_receipt', transaction_id=transaction.transaction_id) }}">Download PDF receipt</a>
+  <a class="btn btn-outline" href="{{ url_for('transactions.history') }}">Back to history</a>
+</div></section>
+{% endblock %}

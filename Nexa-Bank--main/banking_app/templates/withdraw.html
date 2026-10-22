@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Withdraw{% endblock %}
+{% block page_title %}Withdraw{% endblock %}
+{% block content %}
+<div class="page-heading"><h1>Withdraw funds</h1><p class="text-muted">Available balance: ₹{{ "{:,.2f}".format(account.balance) }}. Withdrawal limit: ₹1,00,000.</p></div>
+<section class="card tw-card narrow-form-card"><div class="card-body"><form method="post" action="{{ url_for('transactions.withdraw') }}" data-confirm="Confirm that you want to withdraw this amount from your account.">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="form-group"><label class="form-label" for="amount">Amount (₹)</label><input class="form-control" id="amount" name="amount" type="number" min="5" max="{{ [account.balance, 100000]|min }}" step="5" required><small class="form-hint">Withdrawal amounts must be in multiples of ₹5.</small></div>
+  <div class="form-group"><label class="form-label" for="withdraw_method">Withdrawal method</label><select class="form-control" id="withdraw_method" name="withdraw_method"><option value="atm">ATM</option><option value="branch">Branch</option></select></div>
+  <div class="form-group"><label class="form-label" for="description">Description</label><input class="form-control" id="description" name="description" maxlength="255"></div>
+  <button class="btn btn-primary" type="submit">Withdraw funds</button>
+</form></div></section>
+{% endblock %}

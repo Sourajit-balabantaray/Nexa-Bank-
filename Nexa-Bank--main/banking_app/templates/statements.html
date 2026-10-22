@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Statements{% endblock %}
+{% block page_title %}Statements{% endblock %}
+{% block content %}
+<div class="page-heading"><h1>Account statement</h1><p class="text-muted">Account {{ account.masked_number }}</p></div>
+<section class="card tw-card"><div class="card-body">
+  <form method="post" action="{{ url_for('statements.index') }}" class="filter-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-group"><label class="form-label" for="start_date">From</label><input class="form-control" type="date" id="start_date" name="start_date" value="{{ start_date.strftime('%Y-%m-%d') }}" required></div>
+    <div class="form-group"><label class="form-label" for="end_date">To</label><input class="form-control" type="date" id="end_date" name="end_date" value="{{ end_date.strftime('%Y-%m-%d') }}" required></div>
+    <button class="btn btn-primary" type="submit">Show transactions</button>
+    <a class="btn btn-outline" href="{{ url_for('statements.download', start_date=start_date.strftime('%Y-%m-%d'), end_date=end_date.strftime('%Y-%m-%d')) }}">Download PDF</a>
+  </form>
+</div>
+{% if transactions %}<div class="table-wrapper"><table class="table"><thead><tr><th>Date</th><th>Transaction ID</th><th>Description</th><th>Type</th><th>Amount</th><th>Balance</th></tr></thead><tbody>
+{% for txn in transactions %}<tr><td>{{ txn.created_at.strftime('%d %b %Y') }}</td><td><a href="{{ url_for('transactions.detail', transaction_id=txn.transaction_id) }}">{{ txn.transaction_id }}</a></td><td>{{ txn.description or '—' }}</td><td>{{ txn.transaction_type|title }}</td><td>₹{{ "{:,.2f}".format(txn.amount) }}</td><td>{% if txn.balance_after is not none %}₹{{ "{:,.2f}".format(txn.balance_after) }}{% else %}—{% endif %}</td></tr>{% endfor %}
+</tbody></table></div>{% else %}<div class="card-body empty-state"><p>No transactions in this date range.</p></div>{% endif %}
+</section>
+{% endblock %}

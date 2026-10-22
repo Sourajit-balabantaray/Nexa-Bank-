@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}KYC Review{% endblock %}
+{% block page_title %}KYC Review{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <h1>Identity verification</h1>
+    <p class="text-muted">Review submitted documents. Uploading never verifies a document automatically.</p>
+  </div>
+</div>
+<section class="card">
+  {% if documents %}
+  <div class="table-wrapper">
+    <table class="table">
+      <thead><tr><th>Customer</th><th>Document</th><th>Submitted</th><th>Status</th><th>Secure file</th><th>Review</th></tr></thead>
+      <tbody>
+      {% for document in documents %}
+      <tr class="kyc-admin-row">
+        <td>{{ document.user.full_name }}<small class="transaction-reference">{{ document.user.customer_id }}</small></td>
+        <td>{{ 'Photograph' if document.document_type == 'photograph' else document.document_type|title ~ ' proof' }}</td>
+        <td>{{ document.created_at.strftime('%d %b %Y') }}</td>
+        <td><span class="kyc-status status-{{ document.status }}">{{ document.status|title if document.status != 'pending' else 'Pending Verification' }}</span>
+          {% if document.rejection_reason %}<small class="transaction-reference">{{ document.rejection_reason }}</small>{% endif %}
+        </td>
+        <td><a class="btn btn-outline btn-sm" href="{{ url_for('documents.download', document_id=document.id) }}">Review document</a></td>
+        <td>
+          <form method="post" action="{{ url_for('admin.review_kyc', document_id=document.id) }}" class="kyc-review-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input class="form-control" name="rejection_reason" maxlength="500" placeholder="Reason if rejecting" aria-label="Reason if rejecting">
+            <div class="kyc-review-actions">
+              <button class="btn btn-primary btn-sm" name="decision" value="verify" type="submit">Verify</button>
+              <button class="btn btn-outline btn-sm" name="decision" value="reject" type="submit">Reject</button>
+            </div>
+          </form>
+          <form method="post" action="{{ url_for('admin.delete_kyc_document', document_id=document.id) }}" data-confirm="Permanently delete this encrypted document?">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-ghost btn-sm kyc-delete-button" type="submit">Delete document</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="card-body empty-state"><h2>No documents submitted</h2><p class="text-muted">Submitted KYC documents will appear here for authorized review.</p></div>
+  {% endif %}
+</section>
+{% endblock %}

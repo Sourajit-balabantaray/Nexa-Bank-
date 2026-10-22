@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NexaBank — Smart Banking, Simplified. Manage accounts, track spending, and understand your finances.">
+  <title>NexaBank — Smart Banking, Simplified</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind.css', v='navy-ui-v11') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='navy-ui-v11') }}">
+
+  <style>
+    body { background: #edf6ff; }
+    section { padding: 100px 0; }
+    .section-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 5px 14px;
+      background: rgba(59,130,246,0.1);
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+      color: #60a5fa; text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 800; color: #20252b;
+      margin-bottom: 14px; line-height: 1.15;
+    }
+    .section-desc { font-size: 16px; color: #4b5563; line-height: 1.75; max-width: 540px; margin: 0 auto; }
+
+    .faq-item {
+      background: #f8f9fa;
+      border: 1px solid rgba(59,130,246,0.15);
+      border-radius: 12px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .faq-question {
+      padding: 18px 22px; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 14.5px; font-weight: 600; color: #20252b;
+      user-select: none;
+    }
+    .faq-question:hover { background: rgba(59,130,246,0.06); }
+    .faq-answer {
+      padding: 0 22px; max-height: 0; overflow: hidden;
+      transition: all 0.3s ease; font-size: 13.5px; color: #4b5563; line-height: 1.7;
+    }
+    .faq-answer.open { padding: 0 22px 18px; max-height: 200px; }
+    .faq-icon { transition: transform 0.3s ease; }
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+    .stat-highlight {
+      text-align: center; padding: 40px 24px;
+    }
+    .stat-highlight-num {
+      font-family: 'Outfit', sans-serif;
+      font-size: 48px; font-weight: 800;
+      background: linear-gradient(135deg, #3b82f6, #7c3aed);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .stat-highlight-label { font-size: 14px; color: #64748b; margin-top: 8px; }
+
+    footer { background: #e0efff; border-top: 1px solid rgba(59,130,246,0.14); padding: 40px 0; }
+    .footer-brand {
+      font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 800; color: #20252b;
+      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    }
+    .footer-desc { font-size: 13px; color: #6b7280; max-width: 300px; line-height: 1.6; }
+    .footer-disclaimer { font-size: 11px; color: #4b5563; max-width: 600px; margin-top: 30px; padding-top: 30px; border-top: 1px solid rgba(71,85,105,0.15); line-height: 1.6; }
+
+    .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+  </style>
+</head>
+<body class="landing-page">
+
+<!-- Nav -->
+<nav class="landing-nav sticky top-0 z-50" id="landingNav">
+  <div class="container mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
+    <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+      <div style="width:34px;height:34px;background:linear-gradient(135deg,#3b82f6,#2563eb);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:15px">
+        <i class="fa-solid fa-landmark"></i>
+      </div>
+      <span style="font-family:'Outfit',sans-serif;font-weight:700;font-size:18px;color:#20252b">NexaBank</span>
+    </a>
+    <div class="flex items-center gap-3">
+      <a href="{{ url_for('auth.login') }}" class="btn btn-ghost btn-sm rounded-xl px-4">Login</a>
+      <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm rounded-xl px-4">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero relative overflow-hidden py-20 md:py-28">
+  <div class="hero-bg"></div>
+  <div class="container relative z-10 mx-auto w-full max-w-7xl px-6">
+    <div class="grid grid-cols-1 items-center gap-14 lg:grid-cols-2">
+      <div class="hero-content max-w-2xl">
+        <div class="hero-eyebrow rounded-full px-4 py-2">
+          <i class="fa-solid fa-shield-halved"></i>
+          Banking, made simple
+        </div>
+        <h1 class="hero-title text-5xl font-extrabold leading-tight tracking-tight md:text-6xl">
+          Smart Banking,<br>
+          <span class="accent">Simplified.</span>
+        </h1>
+        <p class="hero-subtitle mt-6 max-w-xl text-lg leading-8">
+          A straightforward place to review account activity, manage transactions, and understand your finances.
+        </p>
+        <div class="hero-cta mt-8 flex flex-wrap gap-3">
+          <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg rounded-xl px-6">
+            <i class="fa-solid fa-rocket"></i>
+            Get Started Free
+          </a>
+          <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-lg rounded-xl px-6">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            Sign In
+          </a>
+        </div>
+        <div style="margin-top:32px;display:flex;gap:24px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#64748b">
+            <i class="fa-solid fa-circle-check" style="color:#10b981"></i>
+            No real money involved
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#64748b">
+            <i class="fa-solid fa-circle-check" style="color:#10b981"></i>
+            Simple account management
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#64748b">
+            <i class="fa-solid fa-circle-check" style="color:#10b981"></i>
+            Instant setup
+          </div>
+        </div>
+      </div>
+
+      <!-- Illustrative interface preview; it contains no live account information. -->
+      <div class="hero-image-area flex justify-center lg:justify-end">
+        <div class="floating-card w-full max-w-sm rounded-3xl border border-white/10 bg-bank-900 p-6 shadow-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+            <div>
+              <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.08em">Total Balance</div>
+              <div style="font-family:'Outfit',sans-serif;font-size:28px;font-weight:800;color:#20252b">₹1,24,580.00</div>
+            </div>
+            <div style="width:44px;height:44px;background:rgba(59,130,246,0.15);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#3b82f6;font-size:18px">
+              <i class="fa-solid fa-wallet"></i>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:12px;margin-bottom:20px">
+            <div style="flex:1;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:12px">
+              <div style="font-size:10px;color:#64748b;margin-bottom:4px">Income</div>
+              <div style="font-size:14px;font-weight:700;color:#10b981">₹45,000</div>
+            </div>
+            <div style="flex:1;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:12px">
+              <div style="font-size:10px;color:#64748b;margin-bottom:4px">Expenses</div>
+              <div style="font-size:14px;font-weight:700;color:#ef4444">₹18,240</div>
+            </div>
+          </div>
+
+          <div style="font-size:12px;color:#64748b;margin-bottom:10px">Recent Activity</div>
+          {% for item in [
+            ('fa-utensils', '#f59e0b', 'Swiggy Order', '-₹340', '#ef4444'),
+            ('fa-briefcase', '#10b981', 'Salary Credit', '+₹45,000', '#10b981'),
+            ('fa-bolt', '#06b6d4', 'Electricity Bill', '-₹1,200', '#ef4444')
+          ] %}
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(11,31,58,0.08)">
+            <div style="width:30px;height:30px;background:rgba({{ '245,158,11' if loop.index==1 else ('16,185,129' if loop.index==2 else '6,182,212') }},0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;color:{{ item[1] }}">
+              <i class="fa-solid {{ item[0] }}"></i>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:500;color:#20252b">{{ item[2] }}</div>
+            </div>
+            <div style="font-size:12px;font-weight:700;color:{{ item[4] }}">{{ item[3] }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ── -->
+<section class="py-20 md:py-24">
+  <div class="container mx-auto max-w-7xl px-6">
+    <div class="mb-12 text-center md:mb-16">
+      <div class="section-eyebrow"><i class="fa-solid fa-star"></i> Features</div>
+      <h2 class="section-title">Everything you need in one place</h2>
+      <p class="section-desc">A complete banking simulation with all the features of a modern banking platform.</p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {% set features = [
+        ('fa-shield-halved', 'Secure Authentication', 'Password hashing, session management, and CSRF protection.'),
+        ('fa-arrows-left-right', 'Money Transfer', 'Instant internal transfers and simulated bank/UPI transfers with confirmation.'),
+        ('fa-chart-line', 'Financial Analytics', 'Clear views of income, expenses, and spending patterns.'),
+        ('fa-lightbulb', 'Smart Insights', 'Rule-based AI-style insights that analyze your spending and savings patterns.'),
+        ('fa-credit-card', 'Account Management', 'Review account details, balances, and masked account information.'),
+        ('fa-file-invoice', 'PDF Statements', 'Download professional bank statements and transaction receipts as PDF files.')
+      ] %}
+      {% for icon, title, desc in features %}
+      <div class="feature-card rounded-2xl p-6 transition duration-200">
+        <div class="feature-icon"><i class="fa-solid {{ icon }}"></i></div>
+        <h3 class="feature-title">{{ title }}</h3>
+        <p class="feature-desc">{{ desc }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ── STATS ── -->
+<section class="py-16 md:py-20">
+  <div class="container mx-auto max-w-7xl px-6">
+    <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+      {% for num, label in [('Accounts', 'Manage your accounts'), ('Transfers', 'Move funds between accounts'), ('Insights', 'Understand your activity'), ('Statements', 'Review transactions')] %}
+      <div class="stat-highlight">
+        <div class="stat-highlight-num">{{ num }}</div>
+        <div class="stat-highlight-label">{{ label }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ── SECURE BANKING ── -->
+<section class="py-20 md:py-24">
+  <div class="container mx-auto max-w-7xl px-6">
+    <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
+      <div>
+        <div class="section-eyebrow"><i class="fa-solid fa-lock"></i> Security</div>
+        <h2 class="section-title" style="text-align:left;margin-bottom:20px">Built with security best practices</h2>
+        <p class="section-desc" style="margin:0;text-align:left;margin-bottom:30px">Your account is protected with modern authentication and data validation features.</p>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:14px">
+          {% for feature in [
+            'Bcrypt password hashing — never stored as plain text',
+            'Flask-Login session management',
+            'CSRF protection on all forms',
+            'Server-side and client-side validation',
+            'Role-based access control (Admin vs Customer)',
+            'SQLAlchemy parameterized queries'
+          ] %}
+          <li style="display:flex;align-items:center;gap:12px;font-size:14px;color:#4b5563">
+            <i class="fa-solid fa-circle-check" style="color:#10b981;flex-shrink:0"></i>
+            {{ feature }}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div style="background:linear-gradient(135deg,#f8f9fa,#e3e6e8);border:1px solid rgba(59,130,246,0.2);border-radius:20px;padding:40px;text-align:center">
+        <div style="font-size:64px;margin-bottom:20px">🔒</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:22px;font-weight:700;color:#20252b;margin-bottom:10px">Your account, protected</div>
+        <div style="font-size:13px;color:#64748b;line-height:1.7">Account features include password protection, secure sessions, and form validation.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FAQ ── -->
+<section class="py-20 md:py-24">
+  <div class="container mx-auto max-w-7xl px-6">
+    <div class="mb-12 text-center md:mb-16">
+      <div class="section-eyebrow"><i class="fa-solid fa-circle-question"></i> FAQ</div>
+      <h2 class="section-title">Frequently Asked Questions</h2>
+    </div>
+    <div class="mx-auto max-w-3xl">
+      {% set faqs = [
+        ('Does NexaBank process real transactions?', 'No. NexaBank is a financial simulation and does not connect to banks or move real money.'),
+        ('Can I create an account?', 'Yes. Register to manage your account, view transaction history, and explore financial insights.'),
+        ('Where is my information stored?', 'Information entered here is stored locally by this application. Do not enter real personal or financial information.')
+      ] %}
+      {% for q, a in faqs %}
+      <div class="faq-item" onclick="this.classList.toggle('open');this.querySelector('.faq-answer').classList.toggle('open')">
+        <div class="faq-question">
+          <span>{{ q }}</span>
+          <i class="fa-solid fa-plus faq-icon" style="color:#3b82f6;flex-shrink:0"></i>
+        </div>
+        <div class="faq-answer">{{ a }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section class="py-20 text-center md:py-24">
+  <div class="container mx-auto max-w-7xl px-6">
+    <h2 style="font-family:'Outfit',sans-serif;font-size:42px;font-weight:800;color:#20252b;margin-bottom:16px">Ready to explore?</h2>
+    <p style="font-size:16px;color:#4b5563;margin-bottom:36px;max-width:400px;margin-left:auto;margin-right:auto;line-height:1.7">Create an account and explore NexaBank.</p>
+    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg rounded-xl px-6">
+      <i class="fa-solid fa-rocket"></i>
+      Get Started Now
+    </a>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="container">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:30px">
+      <div>
+        <div class="footer-brand">
+          <div style="width:32px;height:32px;background:linear-gradient(135deg,#3b82f6,#2563eb);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:14px"><i class="fa-solid fa-landmark"></i></div>
+          NexaBank
+        </div>
+        <p class="footer-desc">A simple way to explore account management and financial insights.</p>
+      </div>
+      <div style="display:flex;gap:40px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px">Navigation</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <a href="{{ url_for('auth.login') }}" style="font-size:13px;color:#4b5563">Login</a>
+            <a href="{{ url_for('auth.register') }}" style="font-size:13px;color:#4b5563">Register</a>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px">Tech Stack</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <span style="font-size:13px;color:#4b5563">Python / Flask</span>
+            <span style="font-size:13px;color:#4b5563">SQLite / SQLAlchemy</span>
+            <span style="font-size:13px;color:#4b5563">Tailwind CSS / Chart.js</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-disclaimer">
+      <strong>Simulation only:</strong> NexaBank does not connect to banks or process real transactions. Do not enter real personal or financial information.
+    </div>
+    <div style="margin-top:24px;font-size:12px;color:#1e293b">© 2024 NexaBank</div>
+  </div>
+</footer>
+
+{% include '_support_chat.html' %}
+<script src="{{ url_for('static', filename='js/main.js', v='nexabank-ui-v14') }}"></script>
+<script src="{{ url_for('static', filename='js/support_chat.js', v='nexabank-rag-v3') }}"></script>
+</body>
+</html>
